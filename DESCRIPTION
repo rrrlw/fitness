@@ -14,3 +14,4 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/rrrlw/fitness
 BugReports: https://github.com/rrrlw/fitness/issues
+RoxygenNote: 6.1.0
