@@ -4,7 +4,7 @@
 \name{fitness}
 \alias{fitness}
 \alias{fitness-package}
-\title{Implementing Functionality for Fitness Landscapes}
+\title{Working with Fitness Landscapes}
 \description{
 A helpful library for useRs studying fitness landscapes. `fitness`
 implements popular models for fitness landscapes (e.g. NK model,

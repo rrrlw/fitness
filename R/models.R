@@ -26,6 +26,7 @@ generate_nk <- function(n, k) {
 #' on RMF models, see Aita et al. (2000)
 #' <doi:10.1002/(SICI)1097-0282(200007)54:1<64::AID-BIP70>3.0.CO;2-R>.
 #'
+#' @importFrom stats rnorm
 #' @param max.seq genotype for the peak of the RMF model
 #' @param c corresponds to the `c` parameter in the RMJ model
 #' @param eta function that returns outputs of a random variable;
