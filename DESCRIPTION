@@ -1,6 +1,6 @@
 Package: fitness
 Type: Package
-Title: Implementing Functionality for Fitness Landscapes
+Title: Working with Fitness Landscapes
 Version: 0.1.0
 Authors@R: c(
     person("Raoul", "Wadhwa",
