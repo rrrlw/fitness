@@ -39,3 +39,11 @@ is implemented:
 ## Contribute
 
 To contribute to fitness, you can create issues for any bugs/suggestions on the [issues page](https://github.com/rrrlw/fitness/issues). You can also fork the fitness repository and create pull requests to add features you think will be useful for users.
+
+## Plan
+
+read_* functions to read in each type of model (or general fitness landscape?)
+write_* functions to write each type of model (or general fitness landscape?)
+method to find optimal peak, to find all peaks (same for valleys?)
+functions to generate NK landscapes, RMF landscapes
+utility functions: calculate lattice distance, list all neighbors (values or coordinates?) for given spot
