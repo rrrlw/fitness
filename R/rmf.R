@@ -52,3 +52,20 @@ new_RMF_FitLand <- function(n_dim, n_vals,
                  t_m = NULL),
             class = "RMF_FitLand")
 }
+
+# calculate transition matrix
+calc_rmf_tm <- function(rmf, method = "") {
+  
+}
+
+validate_RMF_FitLand <- function(rmf) {
+  
+}
+
+RMF_FitLand <- function(n_dim, n_vals, fitness_table, noise_func) {
+  
+}
+
+is.RMF_FitLand <- function(rmf) {
+  
+}
