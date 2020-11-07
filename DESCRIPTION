@@ -4,7 +4,9 @@ Title: Working with Fitness Landscapes
 Version: 0.1.0
 Authors@R: c(
     person("Raoul", "Wadhwa",
-      email = "raoulwadhwa@gmail.com", role = c("aut", "cre")),
+           email = "raoulwadhwa@gmail.com",
+           role = c("aut", "cre")),
+    person("Jeff", "Maltas", role = "aut"),
     person("Jacob", "Scott", role = "aut"))
 Description: A helpful library for useRs studying fitness landscapes. `fitness`
     implements popular models for fitness landscapes (e.g. NK model,
