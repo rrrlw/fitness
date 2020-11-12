@@ -1,7 +1,8 @@
 # constructor for RMF_FitLand class object
 # eventually allow fit_table and rand_term to be functions?
 new_RMF_FitLand <- function(n_dim, n_vals,
-                            fit_table, rand_func) {
+                            fit_table, rand_func,
+                            calc_tm = FALSE) {
   # set variables directly
   ans_n_dim <- n_dim
   ans_n_vals <- n_vals
@@ -45,6 +46,8 @@ new_RMF_FitLand <- function(n_dim, n_vals,
     fits[t(curr_coord)] <- fit_mat[curr_row, ncol(fit_mat)]
   }
   
+  ###NEED TO ADD: check if transition matrix needs to be calculated###
+  
   # return RMF_FitLand object (don't calculate transition matrix until necessary)
   structure(list(n_vals = n_vals,
                  n_dim = n_dim,
@@ -54,7 +57,7 @@ new_RMF_FitLand <- function(n_dim, n_vals,
 }
 
 # calculate transition matrix
-calc_rmf_tm <- function(rmf, method = "") {
+calc_rmf_tm <- function(rmf, method = "", store = FALSE) {
   
 }
 
