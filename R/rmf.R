@@ -1,12 +1,16 @@
 # constructor for RMF_FitLand class object
 # eventually allow fit_table and rand_term to be functions?
+# transition matrix will be handled separately (backend of evolve() or equivalent function - S3 generic?)
 new_RMF_FitLand <- function(n_dim, n_vals,
-                            fit_table, rand_func,
-                            calc_tm = FALSE) {
+                            fit_table,
+                            rand_func = runif(1)) {
+  # conduct basic checks to check if RMF parameters are valid
+  basic_checks_rmf(n_dim, n_vals, fit_table, rand_func,
+                   error = TRUE)
+  
   # set variables directly
   ans_n_dim <- n_dim
   ans_n_vals <- n_vals
-  ans_t_m <- NULL   # don't calculate transition matrix until needed
   
   ## calculate deterministic component of fitness table
   # setup matrix (long format)
@@ -35,8 +39,7 @@ new_RMF_FitLand <- function(n_dim, n_vals,
     
     # add in random component of fitness table
     rand_contr <- rand_func()
-    fit_mat[curr_row, ncol(fit_mat)] <- fit_counter +
-      rand_contr
+    fit_mat[curr_row, ncol(fit_mat)] <- fit_counter + rand_contr
   }
   
   # convert from matrix to array format
@@ -46,29 +49,30 @@ new_RMF_FitLand <- function(n_dim, n_vals,
     fits[t(curr_coord)] <- fit_mat[curr_row, ncol(fit_mat)]
   }
   
-  ###NEED TO ADD: check if transition matrix needs to be calculated###
-  
   # return RMF_FitLand object (don't calculate transition matrix until necessary)
-  structure(list(n_vals = n_vals,
-                 n_dim = n_dim,
-                 fits = fits,
-                 t_m = NULL),
+  structure(list(n_dim = n_dim,
+                 n_vals = n_vals,
+                 fits = fits),
             class = "RMF_FitLand")
 }
 
-# calculate transition matrix
-calc_rmf_tm <- function(rmf, method = "", store = FALSE) {
+# if error = TRUE, throw error if invalid, silent if valid
+# if error = FALSE, return FALSE if invalid, return TRUE if valid
+validate_RMF_FitLand <- function(rmf, error = TRUE) {
+  # basic checks
+  basic_checks_rmf(n_dim = rmf$n_dim, n_vals = rmf$n_vals,
+                   fit_table = NULL,
+                   rand_func = NULL,
+                   error = error)
   
-}
-
-validate_RMF_FitLand <- function(rmf) {
-  
+  # add complex checks
 }
 
 RMF_FitLand <- function(n_dim, n_vals, fitness_table, noise_func) {
   
 }
 
+# TRUE if it can pass validation tests; FALSE otherwise
 is.RMF_FitLand <- function(rmf) {
-  
+  return(validate_RMF_FitLand(rmf, error = FALSE))
 }
