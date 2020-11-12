@@ -37,7 +37,7 @@ new_RMF_FitLand <- function(n_dim, n_vals,
       fit_counter <- fit_counter + fit_table[fit_mat[curr_row, curr_col], curr_col]
     }
     
-    # add in random component of fitness table
+    ## add in random component of fitness table
     rand_contr <- rand_func()
     fit_mat[curr_row, ncol(fit_mat)] <- fit_counter + rand_contr
   }
@@ -50,9 +50,7 @@ new_RMF_FitLand <- function(n_dim, n_vals,
   }
   
   # return RMF_FitLand object (don't calculate transition matrix until necessary)
-  structure(list(n_dim = n_dim,
-                 n_vals = n_vals,
-                 fits = fits),
+  structure(list(fits = fits),
             class = "RMF_FitLand")
 }
 
@@ -60,16 +58,19 @@ new_RMF_FitLand <- function(n_dim, n_vals,
 # if error = FALSE, return FALSE if invalid, return TRUE if valid
 validate_RMF_FitLand <- function(rmf, error = TRUE) {
   # basic checks
-  basic_checks_rmf(n_dim = rmf$n_dim, n_vals = rmf$n_vals,
-                   fit_table = NULL,
-                   rand_func = NULL,
-                   error = error)
   
   # add complex checks
 }
 
 RMF_FitLand <- function(n_dim, n_vals, fitness_table, noise_func) {
-  
+  validate_RMF_FitLand(
+    new_RMF_FitLand(
+      n_dim = n_dim,
+      n_vals = n_vals,
+      fit_table = fitness_table,
+      rand_func = noise_func
+    )
+  )
 }
 
 # TRUE if it can pass validation tests; FALSE otherwise
