@@ -1,3 +1,4 @@
+#####DEPRECATED AFTER NEW FITLAND STRUCTURE#####
 # S3 generic (should be exported)
 # get dimension of a fitness landscape
 get_dim <- function(x, ...) {
