@@ -1,11 +1,16 @@
 # constructor for RMF_FitLand class object
 # eventually allow fit_table and rand_term to be functions?
+# transition matrix will be handled separately (backend of evolve() or equivalent function - S3 generic?)
 new_RMF_FitLand <- function(n_dim, n_vals,
-                            fit_table, rand_func) {
+                            fit_table,
+                            rand_func = runif(1)) {
+  # conduct basic checks to check if RMF parameters are valid
+  basic_checks_rmf(n_dim, n_vals, fit_table, rand_func,
+                   error = TRUE)
+  
   # set variables directly
   ans_n_dim <- n_dim
   ans_n_vals <- n_vals
-  ans_t_m <- NULL   # don't calculate transition matrix until needed
   
   ## calculate deterministic component of fitness table
   # setup matrix (long format)
@@ -32,10 +37,9 @@ new_RMF_FitLand <- function(n_dim, n_vals,
       fit_counter <- fit_counter + fit_table[fit_mat[curr_row, curr_col], curr_col]
     }
     
-    # add in random component of fitness table
+    ## add in random component of fitness table
     rand_contr <- rand_func()
-    fit_mat[curr_row, ncol(fit_mat)] <- fit_counter +
-      rand_contr
+    fit_mat[curr_row, ncol(fit_mat)] <- fit_counter + rand_contr
   }
   
   # convert from matrix to array format
@@ -46,10 +50,7 @@ new_RMF_FitLand <- function(n_dim, n_vals,
   }
   
   # return RMF_FitLand object (don't calculate transition matrix until necessary)
-  structure(list(n_vals = n_vals,
-                 n_dim = n_dim,
-                 fits = fits,
-                 t_m = NULL),
+  structure(list(fits = fits),
             class = "RMF_FitLand")
 }
 
@@ -71,9 +72,17 @@ validate_RMF_FitLand <- function(rmf) {
 }
 
 RMF_FitLand <- function(n_dim, n_vals, fitness_table, noise_func) {
-  
+  validate_RMF_FitLand(
+    new_RMF_FitLand(
+      n_dim = n_dim,
+      n_vals = n_vals,
+      fit_table = fitness_table,
+      rand_func = noise_func
+    )
+  )
 }
 
+# TRUE if it can pass validation tests; FALSE otherwise
 is.RMF_FitLand <- function(rmf) {
-  
+  return(validate_RMF_FitLand(rmf, error = FALSE))
 }
