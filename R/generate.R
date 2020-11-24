@@ -206,9 +206,10 @@ generate_rmf <- function(n_gene, n_allele, fitness, noise) {
 #'
 #' @param n corresponds to the N parameter in the NK model
 #' @param k corresponds to the K parameter in the NK model
+# @param fitness function or fitness table?
 #' @return data frame containing landscape generated via NK model
 #' @export
-generate_nk <- function(...) {
+generate_nk <- function(n, k, fitness) {
   
 }
 
