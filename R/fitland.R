@@ -1,9 +1,9 @@
 #####CONSTRUCTOR & VALIDATOR#####
 # FitLand constructor
-new_FitLand <- function(fit_table, params) {
+new_FitLand <- function(fit_arr, params) {
   # assume all parameters are valid
   ans <- list()
-  ans$fit_table <- fit_table
+  ans$fit_arr <- fit_arr
   ans$params <- params
   
   # return FitLand object
@@ -21,5 +21,9 @@ validate_FitLand <- function(x) {
   
 }
 
-#####HELPERS#####
-# add AFTER generators have been built (just a wrapper for them)
+#####HELPER(S)#####
+FitLand <- function(fit_array, params = list()) {
+  validate_FitLand(
+    new_FitLand(fit_array, params)
+  )
+}

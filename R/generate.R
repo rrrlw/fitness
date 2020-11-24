@@ -1,3 +1,4 @@
+#####ADDITIVE LANDSCAPE#####
 # n_dim = number of genes
 # n_val = allele values per gene
 # wt_fit = wild-type fitness value (assumed to be equal to rep(1, n_dim))
@@ -52,9 +53,10 @@ generate_add <- function(n_gene, n_allele, wt_fit, mut_fit) {
                  type = type)
   
   ## convert to FitLand object
-  new_FitLand(fit_table = fit_table, params = params)
+  new_FitLand(fit_arr = fit_table, params = params)
 }
 
+#####MULTIPLICATIVE LANDSCAPE#####
 # same parameters as generate_add
 generate_mult <- function(n_gene, n_allele, wt_fit, mut_fit) {
   ## validate parameters
@@ -105,25 +107,85 @@ generate_mult <- function(n_gene, n_allele, wt_fit, mut_fit) {
                  type = type)
   
   ## convert to FitLand object
-  new_FitLand(fit_table = fit_table, params = params)
+  new_FitLand(fit_arr = fit_table, params = params)
 }
 
-# n_dim = length of string
-# n_val = number of possible letters in each string position (allow names?)
-# fitness = if array, direct copy; if function (0 or 1 loc param), then generate
+#####ROUGH MT. FUJI MODEL#####
+# n_gene = length of string
+# n_allele = number of possible letters in each string position (allow names?)
+# fitness = if table of fitnesse, use as reference; if function (no params), then generate
 # noise = if array, direct add; if function (no params), then generate
-generate_rmf <- function(n_dim, n_val, fitness, noise) {
+generate_rmf <- function(n_gene, n_allele, fitness, noise) {
+  ## validate parameters
+  check_n_gene(n_gene)
+  check_n_allele(n_allele)
+  if ("function" %in% class(fitness)) {
+    check_rand_func_rmf(fitness)
+  } else {
+    check_fit_table(fitness, n_cols = n_gene, n_rows = n_allele)
+  }
+  if ("function" %in% class(noise)) {
+    check_rand_func_rmf(noise)
+  } else {
+    dim(noise) <- c(prod(dim(noise)), 1)
+    check_fit_table(noise, n_cols = 1, n_rows = n_allele ^ n_gene)
+  }
   
+  ## setup matrix with lattice coordinates
+  fit_mat <- setup_matrix(n_dim = n_gene, n_val = n_allele)
+  val_col <- ncol(fit_mat)
+  
+  ## generate fitness table if `fitness` is a function
+  fit_table <- NULL
+  if ("function" %in% class(fitness)) {
+    ans <- vapply(X = seq_len(n_gene * n_allele),
+                  FUN.VALUE = numeric(1),
+                  FUN = function(i) fitness(),
+                  USE.NAMES = FALSE)
+    dim(ans) <- c(n_allele, n_gene)
+    
+    fit_table <- ans
+  } else {
+    fit_table <- fitness
+  }
+  
+  ## fill out last column w/ appropriate fitness values
+  for (curr_row in seq_len(nrow(fit_mat))) {
+    # go through each column and add up fitness contribution
+    fit_counter <- 0
+    for (curr_col in seq_len(ncol(fit_mat) - 1)) {
+      fit_counter <- fit_counter + fit_table[fit_mat[curr_row, curr_col], curr_col]
+    }
+    
+    ## add in random component of fitness table
+    rand_contr <- ifelse("function" %in% class(noise),
+                         noise(),
+                         noise[curr_row, 1])
+    fit_mat[curr_row, ncol(fit_mat)] <- fit_counter + rand_contr
+  }
+  
+  ## setup params for FitLand object
+  fit_table <- setup_matrix_to_array(fit_mat)
+  dims <- rep(n_allele, n_gene)
+  type <- "rmf"
+  params <- list(dims = dims,
+                 type = type)
+  
+  ## convert to FitLand object
+  new_FitLand(fit_arr = fit_table, params = params)
 }
 
+#####NK MODEL#####
 generate_nk <- function(...) {
   
 }
 
+#####STICKBREAKING MODEL#####
 generate_sb <- function(...) {
   
 }
 
+#####CORRELATED LANDSCAPES#####
 generate_correlated <- function(...) {
   
 }

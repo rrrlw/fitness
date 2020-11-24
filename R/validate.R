@@ -49,3 +49,59 @@ check_mut_fit <- function(mut_fit) {
     }
   }
 }
+
+# valid PRNG function for rough Mt. Fuji fitness landscape
+# conditions:
+#   - class function
+#   - takes no parameters
+# should also return numeric values, but can't check that w/o potentially messing up seed & reproducibility?
+check_rand_func_rmf <- function(rand_func) {
+  # check class function
+  if (!("function" %in% class(rand_func))) {
+    stop(paste("Parameter", rand_func, "should be a function. Passed parameter",
+               "has class =", class(rand_func)))
+  }
+  
+  # check if function takes any parameters
+  if (length(formals(rand_func)) > 0) {
+    stop(paste("Parameter", rand_func, "should be a function that takes zero",
+               "parameters. Passed function takes",
+               length(formals(rand_func)),
+               "parameters."))
+  }
+}
+
+# valid fitness table for landscape
+# conditions:
+#   - matrix
+#   - contains numeric values only
+#   - n_vals rows
+#   - n_dim cols
+#   - no missing values
+check_fit_table <- function(fit_table,
+                            n_cols, n_rows) {
+  # matrix check
+  if (!is.matrix(fit_table)) {
+    stop(paste("Parameter", param_name, "must be a matrix. Passed object has",
+               "class =", class(fit_table)))
+  # num rows check
+  } else if (nrow(fit_table) != n_vals) {
+    stop(paste0("Parameter ", param_name, " should have same number of rows (",
+                nrow(fit_table), ") as there are values in the fitness",
+                " landscape alphabet (", n_vals, ")."))
+  # num cols check
+  } else if (ncol(fit_table) != n_dim) {
+    stop(paste0("Parameter ", param_name, " should have same number of cols (",
+                ncol(fit_table), ") as there are dimensions in the fitness",
+                " landscape (", n_dim, ")."))
+  # numeric check
+  } else if (!is.numeric(fit_table)) {
+    stop(paste("Parameter", param_name, "must contain numeric values. Passed",
+               "object contains values with class =", class(fit_table[1, 1])))
+  # missing values check
+  } else if (sum(complete.cases(fit_table)) < nrow(fit_table)) {
+    stop(paste("Parameter", param_name, "should have no missing values. Passed",
+               "matrix has missing values in rows:",
+               which(!complete.cases(fit_table))))
+  }
+}
