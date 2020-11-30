@@ -306,6 +306,7 @@ generate_nk <- function(n, k, n_allele = 2, fitness) {
 }
 
 #####STICKBREAKING MODEL#####
+# based on: Nagel et al. Genetics. 2012; 190: 655-667.
 generate_sb <- function(...) {
   
 }
