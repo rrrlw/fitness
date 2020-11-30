@@ -203,14 +203,44 @@ generate_rmf <- function(n_gene, n_allele, fitness, noise) {
 #' the fitness value (class `numeric`). For more information
 #' on NK models, see Kauffman & Weinberger (1989)
 #' <doi:10.1016/s0022-5193(89)80019>.
+#' 
+#' 1-based b/c of R instead of 0-based
 #'
 #' @param n corresponds to the N parameter in the NK model
 #' @param k corresponds to the K parameter in the NK model
-# @param fitness function or fitness table?
+# @param fitness function or fitness array?
 #' @return data frame containing landscape generated via NK model
 #' @export
-generate_nk <- function(n, k, fitness) {
+generate_nk <- function(n, k, n_allele = 2, fitness) {
+  ## validate parameters
+  # n
   
+  # k
+  
+  # n_allele
+  
+  # fitness (array or function)
+  
+  ## setup fitness function
+  fitness_func <- NULL
+  if (!("function" %in% class(fitness))) {
+    fitness_func <- function(index_vec) {
+      fitness[t(index_vec)]
+    }
+  } else {
+    fitness_func <- fitness
+  }
+  
+  ## setup matrix with lattice coordinates
+  fit_mat <- setup_matrix(n_dim = n_gene, n_val = n_allele)
+  val_col <- ncol(fit_mat)
+  
+  ## fill out last column w/ appropriate fitness values
+  
+  ## setup params for FitLand object
+  
+  ## convert to FitLand object
+  new_FitLand(fit_arr = fit_table, params = params)
 }
 
 #####STICKBREAKING MODEL#####
