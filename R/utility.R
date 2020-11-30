@@ -4,6 +4,22 @@ close_to_integer <- function(x, eps = 1e-6) {
          abs(x - round(x)) < eps)
 }
 
+close_to_integer_limit <- function(x, eps = 1e-6, min_val = NULL, max_val = NULL) {
+  if (!close_to_integer(x, eps)) {
+    return(FALSE)
+  } else if (!is.null(min_val)) {
+    if (x < min_val) {
+      return(FALSE)
+    }
+  } else if (!is.null(max_val)) {
+    if (x > max_val) {
+      return(FALSE)
+    }
+  }
+  
+  return(TRUE)
+}
+
 #####PARAMETER VALIDITY#####
 # basic validity checks for rough mt fuji landscape
 # error = TRUE will throw an error if invalid; error = FALSE will return TRUE/FALSE based on validity
@@ -253,4 +269,25 @@ setup_matrix_to_array <- function(setup_mat) {
   
   # return array
   return(ans)
+}
+
+# get NK model (K+1)-len substring (cyclic)
+nk_cycle_substr <- function(index_vec, start, len) {
+  ans <- numeric(len)
+  index_counter <- start
+  len_counter <- 1
+  
+  while (len_counter <= len) {
+    ans[len_counter] <- index_vec[index_counter]
+    
+    len_counter <- len_counter + 1
+    index_counter <- index_counter %% length(index_vec) + 1
+  }
+  
+  return(ans)
+}
+
+# number of different elements between 2 numeric vectors
+hamming_dist <- function(vec1, vec2) {
+  sum(vec1 != vec2)
 }
