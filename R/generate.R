@@ -213,13 +213,51 @@ generate_rmf <- function(n_gene, n_allele, fitness, noise) {
 #' @export
 generate_nk <- function(n, k, n_allele = 2, fitness) {
   ## validate parameters
-  # n
+  # n - integer greater than 1
+  if (!close_to_integer_limit(x = n, min_val = 1.5)) {
+    stop(paste("parameter n must be an integer greater than 1, passed value =",
+               n, "with class", class(n)),
+         call. = FALSE)
+  }
   
-  # k
+  # k - 0 <= k < n
+  if (!close_to_integer_limit(x = k, min_val = -0.5, max_val = n - 0.5)) {
+    stop(paste("parameter k must be an integer between 0 and n-1 (inclusive),",
+               "passed value =", k, "with class", class(k)),
+         call. = FALSE)
+  }
   
   # n_allele
+  if (!close_to_integer_limit(x = n_allele, min_val = 0.5)) {
+    stop(paste("parameter n_allele must be a positive integer, passed value =",
+               n_allele, "with class", class(n_allele)),
+         call. = FALSE)
+  }
   
   # fitness (array or function)
+  if (is.function(fitness)) {
+    if (length(formals(fitness)) != 1) {
+      stop(paste("when fitness parameter is a function, it must have a single",
+                 "parameter, passed function takes",
+                 length(formals(fitness)), "parameters"),
+           call. = FALSE)
+    }
+  } else if (is.array(fitness)) {
+    if (!is.numeric(fitness)) {
+      stop("when fitness parameter is an array, it must contain numeric",
+           "values, passed array does not contain numeric values",
+           call. = FALSE)
+    } else if (!all.equal(dim(fitness), rep(n_allele, k + 1))) {
+      stop(paste("when k =", k, "and n_allele =", n_allele, "fitness parameter",
+                 "array must have dim =", rep(n_allele, k + 1), "but passed",
+                 "array has dim =", dim(fitness)),
+           call. = FALSE)
+    }
+  } else {
+    stop(paste("fitness parameter must be a function or array, passed value",
+               "has class =", class(fitness)),
+         call. = FALSE)
+  }
   
   ## setup fitness function
   fitness_func <- NULL
@@ -232,12 +270,36 @@ generate_nk <- function(n, k, n_allele = 2, fitness) {
   }
   
   ## setup matrix with lattice coordinates
-  fit_mat <- setup_matrix(n_dim = n_gene, n_val = n_allele)
+  fit_mat <- setup_matrix(n_dim = n, n_val = n_allele)
   val_col <- ncol(fit_mat)
   
   ## fill out last column w/ appropriate fitness values
+  for (curr_row in seq_len(nrow(fit_mat))) {
+    coords <- as.numeric(
+      fit_mat[curr_row, seq_len(val_col - 1)]
+    )
+    
+    counter_sum <- 0
+    for (start in seq_len(length(coords))) {
+      curr_coords <- nk_cycle_substr(index_vec = coords,
+                                     start = start,
+                                     len = k + 1)
+      
+      counter_sum <- counter_sum + fitness_func(curr_coords)
+    }
+    
+    # store calculated fitness value
+    fit_mat[curr_row, val_col] <- counter_sum
+  }
   
   ## setup params for FitLand object
+  fit_table <- setup_matrix_to_array(fit_mat)
+  type <- "nk"
+  params <- list(n = n,
+                 k = k,
+                 alleles = seq_len(n_allele),
+                 fit_calc = fitness_func,
+                 type = type)
   
   ## convert to FitLand object
   new_FitLand(fit_arr = fit_table, params = params)
