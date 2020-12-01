@@ -261,16 +261,6 @@ generate_rmf <- function(n_gene, n_allele, fitness, noise) {
 #'   returns a single \code{numeric} fitness value
 #' @return fitness landscape stored in \code{FitLand} class object
 #' @export
-#' @examples
-#' n <- 5
-#' k <- 1
-#' n_allele <- 2
-#' landscape <- generate_nk(n = n,
-#'                          k = k,
-#'                          n_allele = n_allele
-#'                          fitness = function(index_vec) {sum(index_vec)})
-#' 
-#' print(landscape)
 generate_nk <- function(n, k, n_allele = 2, fitness) {
   ## validate parameters
   # n - integer greater than 1
