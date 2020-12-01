@@ -20,7 +20,7 @@ Description: Implements many fitness landscapes models permitting study of
     (2000) <doi:10.1002/(SICI)1097-0282(200007)54:1<64::AID-BIP70>3.0.CO;2-R>,
     and stickbreaking model from Nagel et al. (2012)
     <doi:10.1534.genetics.111.132134>.
-License: GPL-3
+License: MIT
 Encoding: UTF-8
 LazyData: true
 URL: https://rrrlw.github.io/fitness/
