@@ -315,12 +315,7 @@ generate_sb <- function(n_gene, n_allele, wt_fit, mut_fit, max_fit) {
   check_n_allele(n_allele)
   check_wt_fit(wt_fit)
   check_mut_fit(mut_fit, n_gene, n_allele)
-  check_max_fit(max_fit)
-  if (max_fit < wt_fit) {
-    stop(paste("maximum fitness must be greater than wild-type fitness in",
-               "stickbreaking model; passed max fitness =", max_fit, "and",
-               "passed wild-type fitness =", wt_fit))
-  }
+  check_max_fit(max_fit, wt_fit)
   
   ## setup matrix with lattice coordinates
   temp_mat <- setup_matrix(n_dim = n_gene, n_val = n_allele)
