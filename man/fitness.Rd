@@ -3,7 +3,6 @@
 \docType{package}
 \name{fitness}
 \alias{fitness}
-\alias{fitness-package}
 \title{Working with Fitness Landscapes}
 \description{
 A helpful library for useRs studying fitness landscapes. `fitness`
