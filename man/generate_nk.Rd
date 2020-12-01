@@ -29,9 +29,11 @@ Kauffman & Weinberger (1989) <doi:10.1016/s0022-5193(89)80019-0>.
 \examples{
 n <- 5
 k <- 1
-landscape <- generate_nk(num_genes,
-                         num_alleles,
-                         fitness = 
-                          
+n_allele <- 2
+landscape <- generate_nk(n = n,
+                         k = k,
+                         n_allele = n_allele
+                         fitness = function(index_vec) {sum(index_vec)})
+
 print(landscape)
 }

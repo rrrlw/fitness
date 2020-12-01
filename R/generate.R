@@ -264,10 +264,12 @@ generate_rmf <- function(n_gene, n_allele, fitness, noise) {
 #' @examples
 #' n <- 5
 #' k <- 1
-#' landscape <- generate_nk(num_genes,
-#'                          num_alleles,
-#'                          fitness = 
-#'                           
+#' n_allele <- 2
+#' landscape <- generate_nk(n = n,
+#'                          k = k,
+#'                          n_allele = n_allele
+#'                          fitness = function(index_vec) {sum(index_vec)})
+#' 
 #' print(landscape)
 generate_nk <- function(n, k, n_allele = 2, fitness) {
   ## validate parameters
@@ -321,7 +323,7 @@ generate_nk <- function(n, k, n_allele = 2, fitness) {
   fitness_func <- NULL
   if (!("function" %in% class(fitness))) {
     fitness_func <- function(index_vec) {
-      fitness[t(index_vec)]
+      fit_mat[t(index_vec)]
     }
   } else {
     fitness_func <- fitness
@@ -379,7 +381,19 @@ generate_nk <- function(n, k, n_allele = 2, fitness) {
 #' @param max_fit maximum fitness value attainable in this landscape
 #' @return fitness landscape stored in \code{FitLand} class object
 #' @export
-#' @examples ***
+#' @examples
+#' n_gene <- 4
+#' n_allele <- 2
+#' wt_fit <- 1
+#' max_fit <- 2
+#' 
+#' landscape <- generate_sb(n_gene = n_gene,
+#'                          n_allele = n_allele,
+#'                          wt_fit = wt_fit,
+#'                          mut_fit = function() {stats::runif(1)},
+#'                          max_fit = max_fit)
+#'
+#' print(landscape)
 generate_sb <- function(n_gene, n_allele, wt_fit, mut_fit, max_fit) {
   ## validate parameters
   check_n_gene(n_gene)

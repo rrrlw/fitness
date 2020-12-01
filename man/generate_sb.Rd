@@ -29,5 +29,16 @@ Generates a fitness landscape using the stickbreaking model, as
 characterized in Nagel et al. (2012) <doi:10.1534.genetics.111.132134>.
 }
 \examples{
-***
+n_gene <- 4
+n_allele <- 2
+wt_fit <- 1
+max_fit <- 2
+
+landscape <- generate_sb(n_gene = n_gene,
+                         n_allele = n_allele,
+                         wt_fit = wt_fit,
+                         mut_fit = function() {stats::runif(1)},
+                         max_fit = max_fit)
+
+print(landscape)
 }
