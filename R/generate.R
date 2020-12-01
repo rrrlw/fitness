@@ -1,4 +1,5 @@
 #####ADDITIVE LANDSCAPE#####
+#' 
 # n_dim = number of genes
 # n_val = allele values per gene
 # wt_fit = wild-type fitness value (assumed to be equal to rep(1, n_dim))
