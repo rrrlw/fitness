@@ -20,14 +20,26 @@ check_wt_fit <- function(wt_fit) {
   }
 }
 
-check_mut_fit <- function(mut_fit) {
+check_max_fit <- function(max_fit, wt_fit) {
+  check_wt_fit(max_fit)
+  
+  if (max_fit < wt_fit) {
+    stop(paste("maximum fitness must be greater than wild-type fitness in",
+               "stickbreaking model; passed max fitness =", max_fit, "and",
+               "passed wild-type fitness =", wt_fit))
+  }
+}
+
+check_mut_fit <- function(mut_fit, n_gene, n_allele) {
   if (!is.function(mut_fit) & !is.matrix(mut_fit)) {
     stop(paste("mut_fit parameter must be a matrix; passed object has class =",
                class(mut_fit)))
   }
-  if (is.function(mut_fit) & length(formals(mut_fit)) > 0) {
-    stop(paste("if mut_fit parameter is a function, it must take 0 parameters;",
-               "passed function takes", length(formals(mut_fit)), "parameters"))
+  if (is.function(mut_fit)) {
+    if (length(formals(mut_fit)) > 0) {
+      stop(paste("if mut_fit parameter is a function, it must take 0 parameters;",
+                 "passed function takes", length(formals(mut_fit)), "parameters"))
+    }
   } else if (is.matrix(mut_fit)) {
     # make sure correct number of dimensions
     if (ncol(mut_fit) != n_gene | nrow(mut_fit) != n_allele) {

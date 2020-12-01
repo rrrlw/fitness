@@ -4,7 +4,7 @@
 # wt_fit = wild-type fitness value (assumed to be equal to rep(1, n_dim))
 # mut_fit = if numeric matrix, generate landscape based on wt + appropriate muts
 #           if function (no params), generate numeric vector, then do same
-generate_add <- function(n_gene, n_allele, wt_fit, mut_fit) {
+generate_add <- function(n_gene, n_allele, wt_fit = 0, mut_fit) {
   ## validate parameters
   check_n_gene(n_gene)
   check_n_allele(n_allele)
@@ -47,10 +47,11 @@ generate_add <- function(n_gene, n_allele, wt_fit, mut_fit) {
   
   ## setup params for FitLand object
   fit_table <- setup_matrix_to_array(temp_mat)
-  dims <- rep(n_allele, n_gene)
-  type <- "add"
-  params <- list(dims = dims,
-                 type = type)
+  params <- list(n_gene = n_gene,
+                 n_allele = n_allele,
+                 wt = wt_fit,
+                 mut = mut_matrix,
+                 type = "add")
   
   ## convert to FitLand object
   new_FitLand(fit_arr = fit_table, params = params)
@@ -58,12 +59,12 @@ generate_add <- function(n_gene, n_allele, wt_fit, mut_fit) {
 
 #####MULTIPLICATIVE LANDSCAPE#####
 # same parameters as generate_add
-generate_mult <- function(n_gene, n_allele, wt_fit, mut_fit) {
+generate_mult <- function(n_gene, n_allele, wt_fit = 1, mut_fit) {
   ## validate parameters
   check_n_gene(n_gene)
   check_n_allele(n_allele)
   check_wt_fit(wt_fit)
-  check_mut_fit(mut_fit)
+  check_mut_fit(mut_fit, n_gene, n_allele)
   
   ## setup matrix with lattice coordinates
   temp_mat <- setup_matrix(n_dim = n_gene, n_val = n_allele)
@@ -101,10 +102,11 @@ generate_mult <- function(n_gene, n_allele, wt_fit, mut_fit) {
   
   ## setup params for FitLand object
   fit_table <- setup_matrix_to_array(temp_mat)
-  dims <- rep(n_allele, n_gene)
-  type <- "mult"
-  params <- list(dims = dims,
-                 type = type)
+  params <- list(n_gene = n_gene,
+                 n_allele = n_allele,
+                 wt = wt_fit,
+                 mut = mut_matrix,
+                 type = "mult")
   
   ## convert to FitLand object
   new_FitLand(fit_arr = fit_table, params = params)
@@ -182,14 +184,14 @@ generate_rmf <- function(n_gene, n_allele, fitness, noise) {
   }
   
   ## setup params for FitLand object
-  fit_table <- setup_matrix_to_array(fit_mat)
-  dims <- rep(n_allele, n_gene)
-  type <- "rmf"
-  params <- list(dims = dims,
-                 type = type)
+  fit_arr <- setup_matrix_to_array(fit_mat)
+  params <- list(n_gene = n_gene,
+                 n_allele = n_allele,
+                 noise_func = noise,
+                 type = "rmf")
   
   ## convert to FitLand object
-  new_FitLand(fit_arr = fit_table, params = params)
+  new_FitLand(fit_arr = fit_arr, params = params)
 }
 
 #####NK MODEL#####
@@ -294,20 +296,81 @@ generate_nk <- function(n, k, n_allele = 2, fitness) {
   
   ## setup params for FitLand object
   fit_table <- setup_matrix_to_array(fit_mat)
-  type <- "nk"
   params <- list(n = n,
                  k = k,
-                 alleles = seq_len(n_allele),
+                 n_allele = n_allele,
                  fit_calc = fitness_func,
-                 type = type)
+                 type = "nk")
+  if (is.array(fitness)) {
+    params$fit_table <- fitness
+  } else {
+    params$fit_func <- fitness_func
+  }
   
   ## convert to FitLand object
-  new_FitLand(fit_arr = fit_table, params = params)
+  new_FitLand(fit_arr = fit_table,
+              params = params)
 }
 
 #####STICKBREAKING MODEL#####
-generate_sb <- function(...) {
+# based on: Nagel et al. Genetics. 2012; 190: 655-667.
+generate_sb <- function(n_gene, n_allele, wt_fit, mut_fit, max_fit) {
+  ## validate parameters
+  check_n_gene(n_gene)
+  check_n_allele(n_allele)
+  check_wt_fit(wt_fit)
+  check_mut_fit(mut_fit, n_gene, n_allele)
+  check_max_fit(max_fit, wt_fit)
   
+  ## setup matrix with lattice coordinates
+  temp_mat <- setup_matrix(n_dim = n_gene, n_val = n_allele)
+  val_col <- ncol(temp_mat)
+  
+  ## fill in last column
+  # get mutations as matrix if not in that form
+  mut_matrix <- NULL
+  if (is.matrix(mut_fit)) {
+    mut_matrix <- mut_fit
+  } else { # assume it's a function
+    mut_matrix <- matrix(NA, nrow = n_allele, ncol = n_gene)
+    mut_matrix[1, ] <- 0 # wild-type
+    for (curr_gene in seq_len(ncol(mut_matrix))) {
+      for (curr_allele in seq(from = 2, to = nrow(mut_matrix), by = 1)) {
+        # not wild-type
+        mut_matrix[curr_allele, curr_gene] <- mut_fit()
+      }
+    }
+  }
+  
+  ## setup fitness table based on mut_matrix
+  d <- max_fit - wt_fit
+  for (curr_genotype in seq_len(nrow(temp_mat))) {
+    # start at wild-type fitness
+    fit <- wt_fit
+    mult_counter <- 1
+    
+    # keep adjusting based on mutations
+    for (curr_gene in seq(from = 1, to = n_gene, by = 1)) {
+      mult_counter <- mult_counter *
+        (1 - mut_matrix[temp_mat[curr_genotype, curr_gene], curr_gene])
+    }
+    
+    # set value in setup matrix
+    fit <- fit + d * (1 - mult_counter)
+    temp_mat[curr_genotype, val_col] <- fit
+  }
+  
+  ## setup params for FitLand object
+  fit_table <- setup_matrix_to_array(temp_mat)
+  params <- list(n_gene = n_gene,
+                 n_allele = n_allele,
+                 wt_fit = wt_fit,
+                 max_fit = max_fit,
+                 mut = mut_matrix,
+                 type = "sb")
+  
+  ## convert to FitLand object
+  new_FitLand(fit_arr = fit_table, params = params)
 }
 
 #####CORRELATED LANDSCAPES#####
