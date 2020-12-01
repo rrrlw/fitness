@@ -47,10 +47,11 @@ generate_add <- function(n_gene, n_allele, wt_fit = 0, mut_fit) {
   
   ## setup params for FitLand object
   fit_table <- setup_matrix_to_array(temp_mat)
-  dims <- rep(n_allele, n_gene)
-  type <- "add"
-  params <- list(dims = dims,
-                 type = type)
+  params <- list(n_gene = n_gene,
+                 n_allele = n_allele,
+                 wt = wt_fit,
+                 mut = mut_matrix,
+                 type = "add")
   
   ## convert to FitLand object
   new_FitLand(fit_arr = fit_table, params = params)
@@ -101,10 +102,11 @@ generate_mult <- function(n_gene, n_allele, wt_fit = 1, mut_fit) {
   
   ## setup params for FitLand object
   fit_table <- setup_matrix_to_array(temp_mat)
-  dims <- rep(n_allele, n_gene)
-  type <- "mult"
-  params <- list(dims = dims,
-                 type = type)
+  params <- list(n_gene = n_gene,
+                 n_allele = n_allele,
+                 wt = wt_fit,
+                 mut = mut_matrix,
+                 type = "mult")
   
   ## convert to FitLand object
   new_FitLand(fit_arr = fit_table, params = params)
@@ -182,14 +184,14 @@ generate_rmf <- function(n_gene, n_allele, fitness, noise) {
   }
   
   ## setup params for FitLand object
-  fit_table <- setup_matrix_to_array(fit_mat)
-  dims <- rep(n_allele, n_gene)
-  type <- "rmf"
-  params <- list(dims = dims,
-                 type = type)
+  fit_arr <- setup_matrix_to_array(fit_mat)
+  params <- list(n_gene = n_gene,
+                 n_allele = n_allele,
+                 noise_func = noise,
+                 type = "rmf")
   
   ## convert to FitLand object
-  new_FitLand(fit_arr = fit_table, params = params)
+  new_FitLand(fit_arr = fit_arr, params = params)
 }
 
 #####NK MODEL#####
@@ -294,17 +296,20 @@ generate_nk <- function(n, k, n_allele = 2, fitness) {
   
   ## setup params for FitLand object
   fit_table <- setup_matrix_to_array(fit_mat)
-  dims <- dim(fit_table)
-  type <- "nk"
   params <- list(n = n,
                  k = k,
-                 alleles = seq_len(n_allele),
+                 n_allele = n_allele,
                  fit_calc = fitness_func,
-                 type = type,
-                 dims = dims)
+                 type = "nk")
+  if (is.array(fitness)) {
+    params$fit_table <- fitness
+  } else {
+    params$fit_func <- fitness_func
+  }
   
   ## convert to FitLand object
-  new_FitLand(fit_arr = fit_table, params = params)
+  new_FitLand(fit_arr = fit_table,
+              params = params)
 }
 
 #####STICKBREAKING MODEL#####
@@ -357,10 +362,12 @@ generate_sb <- function(n_gene, n_allele, wt_fit, mut_fit, max_fit) {
   
   ## setup params for FitLand object
   fit_table <- setup_matrix_to_array(temp_mat)
-  dims <- rep(n_allele, n_gene)
-  type <- "sb"
-  params <- list(dims = dims,
-                 type = type)
+  params <- list(n_gene = n_gene,
+                 n_allele = n_allele,
+                 wt_fit = wt_fit,
+                 max_fit = max_fit,
+                 mut = mut_matrix,
+                 type = "sb")
   
   ## convert to FitLand object
   new_FitLand(fit_arr = fit_table, params = params)
