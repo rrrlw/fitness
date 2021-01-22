@@ -21,7 +21,7 @@
 #' @export
 #' @examples
 #' num_genes <- 4
-#' num_alelles <- 3
+#' num_alleles <- 3
 #' landscape <- generate_add(num_genes,
 #'                           num_alleles,
 #'                           mut_fit = function() {stats::rnorm(1)})
